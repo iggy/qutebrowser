@@ -24,6 +24,7 @@ import sys
 import subprocess
 import faulthandler
 import configparser
+import getpass
 from bdb import BdbQuit
 from functools import partial
 from signal import signal, SIGINT
@@ -32,6 +33,7 @@ from base64 import b64encode
 from PyQt5.QtWidgets import QApplication, QDialog, QMessageBox
 from PyQt5.QtCore import (pyqtSlot, QTimer, QEventLoop, Qt, QStandardPaths,
                           qInstallMessageHandler, QObject, QUrl)
+from PyQt5.QtNetwork import QLocalSocket, QLocalServer
 
 import qutebrowser
 import qutebrowser.commands.utils as cmdutils
@@ -124,6 +126,19 @@ class Application(QApplication):
         sys.excepthook = self._exception_hook
 
         self.args = args
+        self.socket = QLocalSocket(self)
+        self.socket.connectToServer('qutebrowser-{}'.format(getpass.getuser()))
+        is_running = self.socket.waitForConnected(500)
+        if is_running:
+            print("qutebrowser is already running!")
+            sys.exit(0)
+
+        self.server = QLocalServer()
+        ok = self.server.listen('qutebrowser-{}'.format(getpass.getuser()))
+        if not ok:
+            log.init.error("Error while listening: {}".format(self.server.errorString()))
+        #self.server.newConnection.connect(self.on_localsocket_connection)
+
         log.init.debug("Starting init...")
         self._init_misc()
         actute_warning()
