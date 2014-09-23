@@ -699,3 +699,13 @@ class DocstringParser:
             self.arg_descs[argname].append(line.strip() + '\n')
         else:
             self._process_arg(line)
+
+
+def get_object(name, scope='global'):
+    """Helper function to get an object."""
+    return QCoreApplication.instance().obj.get(name, scope)
+
+
+def register_object(name, obj, scope='global'):
+    """Helper function to register an object."""
+    return QCoreApplication.instance().obj.register(name, obj, scope)
