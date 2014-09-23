@@ -703,9 +703,9 @@ class DocstringParser:
 
 def get_object(name):
     """Helper function to get an object."""
-    return QCoreApplication.instance().obj[name]
+    return QCoreApplication.instance().registry[name]
 
 
 def register_object(name, obj):
     """Helper function to register an object."""
-    QCoreApplication.instance().obj[name] = obj
+    QCoreApplication.instance().registry[name] = obj
